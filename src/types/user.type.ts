@@ -1,8 +1,8 @@
 interface UserType {
-  id: number;
-  sub: string;
-  name?: string;
-  phone?: string;
+  id: string;
+  username: string;
+  email: string;
+  password: string;
 }
 
 export default UserType;

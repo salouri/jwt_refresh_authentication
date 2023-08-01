@@ -3,12 +3,14 @@ import type { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet'; // Security
 import compression from 'compression';
-import path from 'path';
+import * as auth from 'middlewares/auth';
 import cookieParser from 'cookie-parser';
 import AppError from 'utils/appError';
 import getEnvVar from 'utils/getEnvVar';
 import errorHandler from 'utils/errorsHandler';
 import httpLogger from 'utils/httpLogger';
+import authRoutes from 'routes/auth.router';
+import restaurantRoutes from 'routes/restaurant.router';
 
 const app = express();
 
@@ -21,14 +23,6 @@ app.enable('trust proxy');
 // Implement CORS to allow other domains to request our API
 
 app.use(cors()); // Acess-Control-Allow-Origin *
-
-// Set the server-side template engine: EJS
-app.set('view engine', 'ejs');
-// Set the views folder
-app.set('views', path.join(__dirname, 'views'));
-
-//Serving static files: ./public directory as the root (/)
-// app.use(express.static(`${__dirname}/public`));
 
 // ***** middleware *****
 
@@ -51,11 +45,13 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(compression());
 
 // **** Routes ****
-// app.use('/api/users', userRouter);
 
 app.use('/api/heartbeat', (req: Request, res: Response) => {
   res.status(200).send('OK');
 });
+
+app.use('/api/auth', authRoutes);
+app.use('/api/restaurants', restaurantRoutes);
 
 // A midleware to handle ALL other (undefined) routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
